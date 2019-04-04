@@ -153,16 +153,6 @@ def t_LNOT(t):
     t.type = 'LNOT'
     return t
 
-def t_LT(t):
-    r'<'
-    t.type = '<'
-    return t
-
-def t_GT(t):
-    r'>'
-    t.type = '>'
-    return t
-
 def t_LE(t):
     r'<='
     t.type = 'LE'
@@ -171,6 +161,16 @@ def t_LE(t):
 def t_GE(t):
     r'>='
     t.type = 'GE'
+    return t
+
+def t_LT(t):
+    r'<'
+    t.type = '<'
+    return t
+
+def t_GT(t):
+    r'>'
+    t.type = '>'
     return t
 
 def t_EQ(t):
@@ -436,9 +436,31 @@ def p_postfix_expression(p):
         term = flatten(p[1])[0]
         if term in symbol_table[scope]:
             if(flatten(p[2])[0] == '++'):
+                if(type(flatten(p[1])[0]) == tuple):
+                    #tindex+=1
+                    #p[0] = (tindex,retrieve(flatten(p[1])[0][1]) + 1)
+                    ll = ['++'," "," ",'t' + str(flatten(p[1])[0][0])]
+                    quad_table.append(l1)
+                else:
+                    #tindex+=1
+                    ll = ['++'," "," ",str(flatten(p[1])[0])]
+                    quad_table.append(ll)
+                    #p[0] = (tindex,retrieve(flatten(p[1])[0]) + 1)
                 symbol_table[scope][term]['value'] += 1
+                
             elif(flatten(p[2])[0] == '--'):
+                if(type(flatten(p[1])[0]) == tuple):
+                    #tindex+=1
+                    #p[0] = (tindex,retrieve(flatten(p[2])[0][1]) - 1)
+                    ll = ['--'," "," ",'t' + str(flatten(p[1])[0][0])]
+                    quad_table.append(l1)
+                else:
+                    #tindex+=1
+                    ll = ['--'," "," ",str(flatten(p[1])[0])]
+                    quad_table.append(ll)
+                    #p[0] = (tindex,retrieve(flatten(p[2])[0]) - 1)
                 symbol_table[scope][term]['value'] -= 1
+            p[0]=p[2]
     else:
         p[0] = p[1:]
 
@@ -457,12 +479,34 @@ def p_unary_expression(p):
         term = flatten(p[2])[0]
         if term in symbol_table[scope]:
             if(flatten(p[1])[0] == '++'):
+                if(type(flatten(p[2])[0]) == tuple):
+                    #tindex+=1
+                    #p[0] = (tindex,retrieve(flatten(p[2])[0][1]) + 1)
+                    ll = ['++'," "," ",'t' + str(flatten(p[2])[0][0])]
+                    quad_table.append(l1)
+                else:
+                    #tindex+=1
+                    ll = ['++'," "," ",str(flatten(p[2])[0])]
+                    quad_table.append(ll)
+                    #p[0] = (tindex,retrieve(flatten(p[2])[0]) + 1)
                 symbol_table[scope][term]['value'] += 1
+                
             elif(flatten(p[1])[0] == '--'):
+                #print(term)
+                if(type(flatten(p[2])[0]) == tuple):
+                    #tindex+=1
+                    #p[0] = (tindex,retrieve(flatten(p[2])[0][1]) - 1)
+                    ll = ['--'," "," ",'t' + str(flatten(p[2])[0][0])]
+                    quad_table.append(l1)
+                else:
+                    #tindex+=1
+                    ll = ['--'," "," ",str(flatten(p[2])[0])]
+                    quad_table.append(ll)
+                    #p[0] = (tindex,retrieve(flatten(p[2])[0]) - 1)
                 symbol_table[scope][term]['value'] -= 1
+            p[0]=p[2]
     else:
         p[0] = p[1:]
-    p[0] = p[1:]
 
 def p_unary_operator(p):
     '''unary_operator : '&'
@@ -481,27 +525,42 @@ def p_multiplicative_expression(p):
     global tindex
     if(len(p)==4):
         if(flatten(p[2])[0] == '*'):
-            p[0] = retrieve(flatten(p[1])[0]) * retrieve(flatten(p[3])[0])
+            if(type(flatten(p[3])[0]) == tuple):
+                tindex+=1
+                p[0] = (tindex,retrieve(flatten(p[1])[0]) * retrieve(flatten(p[3])[0][1]))
+                ll = ['*',flatten(p[1])[0],'t' + str(flatten(p[3])[0][0]),'t'+str(tindex)]
+                quad_table.append(l1)
+            else:
+                tindex+=1
+                ll = ['*',flatten(p[1])[0],str(flatten(p[3])[0]),'t'+str(tindex)]
+                quad_table.append(ll)
+                p[0] = (tindex,retrieve(flatten(p[1])[0]) * retrieve(flatten(p[3])[0]))
         elif(flatten(p[2])[0] == '/'):
             if(type(flatten(p[3])[0]) == tuple):
                 tindex+=1
                 p[0] = (tindex,retrieve(flatten(p[1])[0]) / retrieve(flatten(p[3])[0][1]))
                 if(type(retrieve(flatten(p[1])[0])) == int and type(retrieve(flatten(p[3])[0][1])) == int):
                     p[0] = (tindex,int(retrieve(flatten(p[1])[0]) / retrieve(flatten(p[3])[0][1])))
-                #print("{: <20} {: <20} {: <20} {: <20}".format('/',flatten(p[1])[0],'t' + str(flatten(p[3])[0][0]),'t'+str(tindex)))
                 ll = ['/',flatten(p[1])[0],'t' + str(flatten(p[3])[0][0]),'t'+str(tindex)]
                 quad_table.append(l1)
             else:
                 tindex+=1
-                #print('t',tindex,' = ',flatten(p[1])[0],' + ',flatten(p[3])[0])
-                #print("{: <20} {: <20} {: <20} {: <20}".format('/',flatten(p[1])[0],'t' + str(flatten(p[3])[0]),'t'+str(tindex)))
-                ll = ['/',flatten(p[1])[0],'t' + str(flatten(p[3])[0]),'t'+str(tindex)]
+                ll = ['/',flatten(p[1])[0],str(flatten(p[3])[0]),'t'+str(tindex)]
                 quad_table.append(ll)
                 p[0] = (tindex,retrieve(flatten(p[1])[0]) / retrieve(flatten(p[3])[0]))
                 if(type(retrieve(flatten(p[1])[0])) == int and type(retrieve(flatten(p[3])[0])) == int):
                     p[0] = (tindex,int(retrieve(flatten(p[1])[0]) / retrieve(flatten(p[3])[0])))
         else:
-            p[0] = retrieve(flatten(p[1])[0]) % retrieve(flatten(p[3])[0])
+            if(type(flatten(p[3])[0]) == tuple):
+                tindex+=1
+                p[0] = (tindex,retrieve(flatten(p[1])[0]) % retrieve(flatten(p[3])[0][1]))
+                ll = ['%',flatten(p[1])[0],'t' + str(flatten(p[3])[0][0]),'t'+str(tindex)]
+                quad_table.append(l1)
+            else:
+                tindex+=1
+                ll = ['%',flatten(p[1])[0],str(flatten(p[3])[0]),'t'+str(tindex)]
+                quad_table.append(ll)
+                p[0] = (tindex,retrieve(flatten(p[1])[0]) % retrieve(flatten(p[3])[0]))
     else:
         p[0] = p[1:]
 
@@ -516,20 +575,24 @@ def p_additive_expression(p):
             if(type(flatten(p[3])[0]) == tuple):
                 tindex+=1
                 p[0] = (tindex,retrieve(flatten(p[1])[0]) + retrieve(flatten(p[3])[0][1]))
-                #print('t',tindex,' = ',flatten(p[1])[0],' + t',flatten(p[3])[0][0])
-                #print("{: <20} {: <20} {: <20} {: <20}".format('+',flatten(p[1])[0],'t' + str(flatten(p[3])[0][0]),'t'+str(tindex)))
                 ll = ['+',flatten(p[1])[0],'t' + str(flatten(p[3])[0][0]),'t'+str(tindex)]
+                quad_table.append(ll)
+            else:
+                tindex+=1
+                ll = ['+',flatten(p[1])[0],str(flatten(p[3])[0]),'t'+str(tindex)]
+                quad_table.append(ll)
+                p[0] = (tindex,retrieve(flatten(p[1])[0]) + retrieve(flatten(p[3])[0]))
+        else:
+            if(type(flatten(p[3])[0]) == tuple):
+                tindex+=1
+                p[0] = (tindex,retrieve(flatten(p[1])[0]) - retrieve(flatten(p[3])[0][1]))
+                ll = ['-',flatten(p[1])[0],'t' + str(flatten(p[3])[0][0]),'t'+str(tindex)]
                 quad_table.append(l1)
             else:
                 tindex+=1
-                #print('t',tindex,' = ',flatten(p[1])[0],' + ',flatten(p[3])[0])
-                #print("{: <20} {: <20} {: <20} {: <20}".format('+',flatten(p[1])[0],'t' + str(flatten(p[3])[0]),'t'+str(tindex)))
-                ll = ['+',flatten(p[1])[0],'t' + str(flatten(p[3])[0]),'t'+str(tindex)]
+                ll = ['-',flatten(p[1])[0],str(flatten(p[3])[0]),'t'+str(tindex)]
                 quad_table.append(l1)
-                p[0] = (tindex,retrieve(flatten(p[1])[0]) + retrieve(flatten(p[3])[0]))
-        else:
-            p[0] = retrieve(flatten(p[1])[0]) - retrieve(flatten(p[3])[0])
-        #print(p[1:])
+                p[0] = (tindex,retrieve(flatten(p[1])[0]) - retrieve(flatten(p[3])[0]))
     else:
         p[0] = p[1:]
 
@@ -539,17 +602,71 @@ def p_relational_expression(p):
     | relational_expression '>' additive_expression
     | relational_expression LE additive_expression
     | relational_expression GE additive_expression'''
+    global tindex
     if(len(p) == 4):
-        term1 = retrieve(flatten(p[1])[0])
-        term2 = retrieve(flatten(p[3])[0])    
-        if(flatten(p[2]) =='<'):
-            p[0] = term1 < term2
-        elif(flatten(p[2]) =='>'):
-            p[0] = term1 > term2
-        elif(flatten(p[2]) =='LE'):
-            p[0] = term1 <= term2
-        elif(flatten(p[2]) =='GE'):
-            p[0] = term1 >= term2
+        #print(flatten(p[2]))
+        term1 = flatten(p[1])[0]
+        term2 = flatten(p[3])[0]
+        #print(term1,term2)
+        tindex+=1        
+        if(flatten(p[2])[0] =='<'):
+            if(type(term1) == tuple and type(term2) == tuple):
+                p[0] = (tindex,retrieve(term1[1]) < retrieve(term2[1]))
+                ll = ['<','t' + str(term1[0]),'t' + str(term2[0]),'t'+str(tindex)]
+            elif(type(term1) == tuple):
+                p[0] = (tindex,retrieve(term1[1]) < retrieve(term2))
+                ll = ['<','t' + str(term1[0]),str(term2),'t'+str(tindex)]
+            elif(type(term2) == tuple):
+                p[0] = (tindex,retrieve(term1) < retrieve(term2[1]))
+                ll = ['<',str(term1),'t' + str(term2[0]),'t'+str(tindex)]
+            else:
+                p[0] = (tindex,retrieve(term1) < retrieve(term2))
+                ll = ['<',str(term1),str(term2),'t'+str(tindex)]
+            quad_table.append(ll)
+        elif(flatten(p[2])[0] =='>'):
+            if(type(term1) == tuple and type(term2) == tuple):
+                p[0] = (tindex,retrieve(term1[1]) > retrieve(term2[1]))
+                ll = ['>','t' + str(term1[0]),'t' + str(term2[0]),'t'+str(tindex)]
+            elif(type(term1) == tuple):
+                p[0] = (tindex,retrieve(term1[1]) > retrieve(term2))
+                ll = ['>','t' + str(term1[0]),str(term2),'t'+str(tindex)]
+            elif(type(term2) == tuple):
+                p[0] = (tindex,retrieve(term1) > retrieve(term2[1]))
+                ll = ['>',str(term1),'t' + str(term2[0]),'t'+str(tindex)]
+            else:
+                p[0] = (tindex,retrieve(term1) > retrieve(term2))
+                ll = ['>',str(term1),str(term2),'t'+str(tindex)]
+            quad_table.append(ll)  
+        elif(flatten(p[2])[0] == '<='):
+            #print("LEEE")
+            if(type(term1) == tuple and type(term2) == tuple):
+                p[0] = (tindex,retrieve(term1[1]) <= retrieve(term2[1]))
+                ll = ['<=','t' + str(term1[0]),'t' + str(term2[0]),'t'+str(tindex)]
+            elif(type(term1) == tuple):
+                p[0] = (tindex,retrieve(term1[1]) <= retrieve(term2))
+                ll = ['<=','t' + str(term1[0]),str(term2),'t'+str(tindex)]
+            elif(type(term2) == tuple):
+                p[0] = (tindex,retrieve(term1) <= retrieve(term2[1]))
+                ll = ['<=',str(term1),'t' + str(term2[0]),'t'+str(tindex)]
+            else:
+                p[0] = (tindex,retrieve(term1) <= retrieve(term2))
+                ll = ['<=',str(term1),str(term2),'t'+str(tindex)]
+            quad_table.append(ll)
+        elif(flatten(p[2])[0] == '>='):
+            #print("GEEE")
+            if(type(term1) == tuple and type(term2) == tuple):
+                p[0] = (tindex,retrieve(term1[1]) >= retrieve(term2[1]))
+                ll = ['>=','t' + str(term1[0]),'t' + str(term2[0]),'t'+str(tindex)]
+            elif(type(term1) == tuple):
+                p[0] = (tindex,retrieve(term1[1]) >= retrieve(term2))
+                ll = ['>=','t' + str(term1[0]),str(term2),'t'+str(tindex)]
+            elif(type(term2) == tuple):
+                p[0] = (tindex,retrieve(term1) >= retrieve(term2[1]))
+                ll = ['>=',str(term1),'t' + str(term2[0]),'t'+str(tindex)]
+            else:
+                p[0] = (tindex,retrieve(term1) >= retrieve(term2))
+                ll = ['>=',str(term1),str(term2),'t'+str(tindex)]
+            quad_table.append(ll)
     else:
         p[0] = p[1:]
 
@@ -627,23 +744,59 @@ def p_assignment_expression(p):
         term = flatten(p[1])[0]
         if term in symbol_table[scope]:
             if(flatten(p[2])[0] == '='):
-                #print(flatten(p[3])[0],type(flatten(p[3])[0]))
                 if(type(flatten(p[3])[0]) == tuple):
                     symbol_table[scope][term]['value'] = flatten(p[3])[0][1]
-                    print("{: <20} {: <20} {: <20} {: <20}".format('=','t' + str(flatten(p[3])[0][0])," ",term))
+                    ll=['=','t' + str(flatten(p[3])[0][0])," ",term]
+                    quad_table.append(ll)
                 else:
                     symbol_table[scope][term]['value'] = flatten(p[3])[0]
-                    print("{: <20} {: <20} {: <20} {: <20}".format('=',flatten(p[3])[0]," ",term))
+                    ll=['=',str(flatten(p[3])[0])," ",term]
+                    quad_table.append(ll)
             elif(flatten(p[2])[0] == '*='):
-                symbol_table[scope][term]['value'] *= flatten(p[3])[0]
+                if(type(flatten(p[3])[0]) == tuple):
+                    symbol_table[scope][term]['value'] *= flatten(p[3])[0][1]
+                    ll=['*=','t' + str(flatten(p[3])[0][0])," ",term]
+                    quad_table.append(ll)
+                else:
+                    symbol_table[scope][term]['value'] *= flatten(p[3])[0]
+                    ll=['*=',str(flatten(p[3])[0])," ",term]
+                    quad_table.append(ll)
             elif(flatten(p[2])[0] == '/='):
-                symbol_table[scope][term]['value'] /= flatten(p[3])[0]
+                if(type(flatten(p[3])[0]) == tuple):
+                    symbol_table[scope][term]['value'] /= flatten(p[3])[0][1]
+                    ll=['/=','t' + str(flatten(p[3])[0][0])," ",term]
+                    quad_table.append(ll)
+                else:
+                    symbol_table[scope][term]['value'] /= flatten(p[3])[0]
+                    ll=['/=',str(flatten(p[3])[0])," ",term]
+                    quad_table.append(ll)
             elif(flatten(p[2])[0] == '%='):
-                symbol_table[scope][term]['value'] %= flatten(p[3])[0]
+                if(type(flatten(p[3])[0]) == tuple):
+                    symbol_table[scope][term]['value'] %= flatten(p[3])[0][1]
+                    ll=['%=','t' + str(flatten(p[3])[0][0])," ",term]
+                    quad_table.append(ll)
+                else:
+                    symbol_table[scope][term]['value'] %= flatten(p[3])[0]
+                    ll=['%=',str(flatten(p[3])[0])," ",term]
+                    quad_table.append(ll)
             elif(flatten(p[2])[0] == '+='):
-                symbol_table[scope][term]['value'] += flatten(p[3])[0]
+                if(type(flatten(p[3])[0]) == tuple):
+                    symbol_table[scope][term]['value'] += flatten(p[3])[0][1]
+                    ll=['+=','t' + str(flatten(p[3])[0][0])," ",term]
+                    quad_table.append(ll)
+                else:
+                    symbol_table[scope][term]['value'] += flatten(p[3])[0]
+                    ll=['+=',str(flatten(p[3])[0])," ",term]
+                    quad_table.append(ll)
             elif(flatten(p[2])[0] == '-='):
-                symbol_table[scope][term]['value'] -= flatten(p[3])[0]
+                if(type(flatten(p[3])[0]) == tuple):
+                    symbol_table[scope][term]['value'] -= flatten(p[3])[0][1]
+                    ll=['-=','t' + str(flatten(p[3])[0][0])," ",term]
+                    quad_table.append(ll)
+                else:
+                    symbol_table[scope][term]['value'] -= flatten(p[3])[0]
+                    ll=['-=',str(flatten(p[3])[0])," ",term]
+                    quad_table.append(ll)
     p[0] = p[1:]
 
 def p_assignment_operator(p):
@@ -669,7 +822,6 @@ def p_declaration(p):
     for i in flatten(p[2]):
         if i in symbol_table[scope]:
             symbol_table[scope][i]["tspecifier"] = tspecifier
-        
     p[0] = p[1:]
 
 def p_init_declarator_list(p):
@@ -687,11 +839,15 @@ def p_init_declarator(p):
             #print(flatten(p[3])[0],type(flatten(p[3])[0]))
             if(type(flatten(p[3])[0]) == tuple):
                 symbol_table[scope][term]['value'] = flatten(p[3])[0][1]
-                print("{: <20} {: <20} {: <20} {: <20}".format('=','t' + str(flatten(p[3])[0][0])," ",term))
+                #print("{: <20} {: <20} {: <20} {: <20}".format('=','t' + str(flatten(p[3])[0][0])," ",term))
+                ll=['=','t' + str(flatten(p[3])[0][0])," ",term]
+                quad_table.append(ll)
             else:
                 symbol_table[scope][term]['value'] = flatten(p[3])[0]
                 #print('= \t\t ',flatten(p[3])[0],"\t\t\t",term)
-                print("{: <20} {: <20} {: <20} {: <20}".format('=',flatten(p[3])[0]," ",term))
+                #print("{: <20} {: <20} {: <20} {: <20}".format('=',flatten(p[3])[0]," ",term))
+                ll=['=',str(flatten(p[3])[0])," ",term]
+                quad_table.append(ll)
     p[0] = p[1:]
 
 def p_type_specifier(p):
@@ -860,9 +1016,11 @@ while True:
         break      # No more input
     print(tok)
 '''
+x = parser.parse(input_str)
 print("Quadruple format")
 print("{: <20} {: <20} {: <20} {: <20}".format("operator","arg1","arg2","result"))
-x = parser.parse(input_str)
+for rows in quad_table:
+    print("{: <20} {: <20} {: <20} {: <20}".format(rows[0],rows[1],rows[2],rows[3]))
 print("\n\n\n============Parser Output============")
 print(x)
 print('success')
