@@ -10,12 +10,12 @@ int main () {
     a = a + 5;
       do {
           b = b + 4;
-          if( b > 78){
+          if( b >= 78 + a){
             printf("b");
-            if ( b < 90){
+            if ( b + 5 <= 90){
               do{
                 dddd *= 2;
-              } while (dddd < 2000);
+              } while (dddd + b < 2000 + 4);
               printf("awesome");
             }
             else{
