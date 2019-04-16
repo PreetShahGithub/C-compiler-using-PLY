@@ -968,16 +968,17 @@ def p_init_declarator(p):
                 #print("{: <20} {: <20} {: <20} {: <20}".format('=','t' + str(flatten(p[3])[0][0])," ",term))
                 ll=['=','t' + str(flatten(p[3])[0][0])," ",term]
                 quad_table.append(ll)
-                p[0] = retrieve(flatten(p[3])[0][1])
+                #p[0] = str(retrieve(flatten(p[3])[0][1]))
             else:
                 symbol_table[scope][term]['value'] = retrieve(flatten(p[3])[0])
                 ll=['=',(flatten(p[3])[0])," ",term]
                 quad_table.append(ll)
-                p[0] = retrieve(flatten(p[3])[0])
+                #p[0] = str(retrieve(flatten(p[3])[0]))
             #if(symbol_table[scope][term]['tspecifier'] != type(symbol_table[scope][term]['value'])):
             #    print("Type error: expected type ", symbol_table[scope][term]['tspecifier'], " given ",type(symbol_table[scope][term]['tspecifier']))
-    else:
-        p[0] = p[1:]
+    #else:
+    #    p[0] = p[1:]
+    p[0] = p[1:]
 
 def p_type_specifier(p):
     '''type_specifier : VOID
