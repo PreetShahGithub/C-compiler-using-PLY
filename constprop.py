@@ -1225,19 +1225,19 @@ def getvalue(constprop,key):
 def constprop(quad_table):
     binop = ['+','-','*','/','%','^','&','|','&&','||']
     unop = ['++','--','+=','-=','*=','/=','%=']
-    flag = 1
-    while(flag):
-        flag = 0
+    while True:
+        length = len(quad_table)
+        print("length=",length)
         constprop = {}
         for i in range(len(quad_table)):
             oper = quad_table[i][0]
             if(oper == '='):
-                constprop[quad_table[i][3]] = quad_table[i][1]
+                constprop[quad_table[i][3]],x1 = getvalue(constprop,quad_table[i][1])
+                quad_table[i] = ['=',constprop[quad_table[i][3]],' ',quad_table[i][3]]
             elif(oper in binop):
                 term1,x1 = getvalue(constprop,quad_table[i][1])
                 term2,x2 = getvalue(constprop,quad_table[i][2])
                 if(x1 and x2):
-                    flag = 1
                     if(oper == '+'):
                         answer = term1 + term2
                     elif(oper == '-'):
@@ -1270,7 +1270,6 @@ def constprop(quad_table):
                     term1,x1 = getvalue(constprop,quad_table[i][3])
                     term2,x2 = getvalue(constprop,quad_table[i][1])
                     if(x1):
-                        flag = 1
                         if(oper == '+='):
                             answer = term1 + term2
                         elif(oper == '-='):
@@ -1289,6 +1288,8 @@ def constprop(quad_table):
             print(i,") {: <20} {: <20} {: <20} {: <20}".format(rows[0],rows[1],rows[2],rows[3]))
             i+=1
         deadcode(quad_table)
+        if(length == len(quad_table)):
+            break
 
 constprop(quad_table)
 print("\n\n\n============Parser Output============")
